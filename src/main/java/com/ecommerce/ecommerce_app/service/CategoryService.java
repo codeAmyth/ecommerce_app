@@ -8,6 +8,7 @@ public interface CategoryService {
     // interface for promoting the loose coupling and modularity
 
     List<Category> getAllCategories();
+
     void createCategory(Category category);
 
     String deleteCategory(long categoryId);
