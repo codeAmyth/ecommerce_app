@@ -8,6 +8,7 @@ import com.ecommerce.ecommerce_app.payload.CategoryResponse;
 import com.ecommerce.ecommerce_app.repositories.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,34 +45,39 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void createCategory(Category category) {
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
-        if(savedCategory != null) {
-            throw new APIException("Category with name "+category.getCategoryName() + " already exist." );
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+
+        Category category = modelMapper.map(categoryDTO , Category.class); // categoryDTO mapped with Category.clss
+
+        Category categoryFromDb = categoryRepository.findByCategoryName(category.getCategoryName());  // model mapper converts one object to another
+        if(categoryFromDb != null) {
+            throw new APIException("Category with name "+category.getCategoryName() + " already exist." ); // validation
         }
-        categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        return modelMapper.map(savedCategory , CategoryDTO.class);
     }
 
     @Override
-    public String deleteCategory(long categoryId) {
+    public CategoryDTO deleteCategory(long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "CategoryId" , categoryId));
 
         categoryRepository.delete(category);
-        return "Category with category id: " + categoryId + " deleted successfully";
+        return modelMapper.map(category, CategoryDTO.class);
     }
 
     @Override
-    public Category updateCateogry(Category category, Long categoryId) {
+    public CategoryDTO updateCateogry(CategoryDTO categoryDTO, Long categoryId) {
+
         Optional<Category> savedCategoryOptional = categoryRepository.findById(categoryId);
 
         Category savedCategory = savedCategoryOptional
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "CategoryId" , categoryId));
-
+        Category category = modelMapper.map(categoryDTO , Category.class);
         category.setCategoryID(categoryId);
 
         savedCategory = categoryRepository.save(category);
-        return savedCategory;
+        return modelMapper.map(savedCategory, CategoryDTO.class);
 
     }
 }
