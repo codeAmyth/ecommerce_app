@@ -1,13 +1,14 @@
 package com.ecommerce.ecommerce_app.service;
 
 import com.ecommerce.ecommerce_app.model.Category;
+import com.ecommerce.ecommerce_app.payload.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryService {
     // interface for promoting the loose coupling and modularity
 
-    List<Category> getAllCategories();
+    CategoryResponse getAllCategories();
 
     void createCategory(Category category);
 

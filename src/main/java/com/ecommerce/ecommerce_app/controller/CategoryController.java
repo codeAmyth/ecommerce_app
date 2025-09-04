@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerce_app.controller;
 
 import com.ecommerce.ecommerce_app.model.Category;
+import com.ecommerce.ecommerce_app.payload.CategoryResponse;
 import com.ecommerce.ecommerce_app.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -21,9 +22,9 @@ public class CategoryController {
     }
 
     @GetMapping("api/public/categories")  // get request handle by rest controller
-    public ResponseEntity<List<Category>> getCategories() {
-        List<Category> categories =  categoryService.getAllCategories();
-        return new ResponseEntity<>(categories, HttpStatus.OK);
+    public ResponseEntity<CategoryResponse> getCategories() {
+        CategoryResponse categoryResponse =  categoryService.getAllCategories();
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
     @PostMapping("api/public/categories") // post request
