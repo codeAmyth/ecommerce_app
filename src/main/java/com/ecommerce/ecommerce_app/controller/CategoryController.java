@@ -1,6 +1,6 @@
 package com.ecommerce.ecommerce_app.controller;
 
-import com.ecommerce.ecommerce_app.model.Category;
+import com.ecommerce.ecommerce_app.config.AppConstants;
 import com.ecommerce.ecommerce_app.payload.CategoryDTO;
 import com.ecommerce.ecommerce_app.payload.CategoryResponse;
 import com.ecommerce.ecommerce_app.service.CategoryService;
@@ -9,27 +9,24 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 public class CategoryController {
 
     private CategoryService categoryService;  // this is for loose coupling
 
-    @GetMapping("/echo")
-    public ResponseEntity<String> echoMessage(@RequestParam(name = "message") String message) {
-        return new ResponseEntity<>("Hello World: " + message , HttpStatus.OK );
-    }
-
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService; //constructor injection
     }
 
     @GetMapping("api/public/categories")  // get request handle by rest controller
-    public ResponseEntity<CategoryResponse> getCategories() {
-        CategoryResponse categoryResponse =  categoryService.getAllCategories();
+    public ResponseEntity<CategoryResponse> getCategories(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORIES_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder
+    ) {
+        CategoryResponse categoryResponse =  categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
         return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 

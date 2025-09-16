@@ -1,0 +1,35 @@
+package com.ecommerce.ecommerce_app.service;
+
+import com.ecommerce.ecommerce_app.exception.ResourceNotFoundException;
+import com.ecommerce.ecommerce_app.model.Category;
+import com.ecommerce.ecommerce_app.model.Product;
+import com.ecommerce.ecommerce_app.payload.ProductDTO;
+import com.ecommerce.ecommerce_app.repositories.CategoryRepository;
+import com.ecommerce.ecommerce_app.repositories.ProductRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ProductServiceImpl implements ProductService{
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Override
+    public ProductDTO addProduct(Long categoryId, Product product) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category", "CategoryId",categoryId));
+        product.setCategory(category);
+        product.setImage("default.png");
+        double specialPrice = product.getPrice() - (product.getDiscount() * 0.01) * product.getPrice();
+        product.setSpecialPrice(specialPrice);
+        Product savedProduct = productRepository.save(product);
+        return modelMapper.map(savedProduct, ProductDTO.class);
+
+    }
+}

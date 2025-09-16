@@ -8,7 +8,10 @@ import com.ecommerce.ecommerce_app.payload.CategoryResponse;
 import com.ecommerce.ecommerce_app.repositories.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,10 +28,17 @@ public class CategoryServiceImpl implements CategoryService{
     private ModelMapper modelMapper;
 
     @Override
-    public CategoryResponse getAllCategories() {
+    public CategoryResponse getAllCategories(Integer pageNumber , Integer pageSize, String sortBy, String sortOrder) {
+
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending(); // Sort object can use to sort
+
+        Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByAndOrder);
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetails); // this is how my pageable find the data on database
         List<Category> myCategories = new ArrayList<>(); // creating list of categories
-        myCategories = categoryRepository.findAll();
-        if(myCategories.isEmpty()) { // adding vallidations
+        myCategories = categoryPage.getContent(); // getContent will return a list of Categories
+        if(myCategories.isEmpty()) { // adding validations
             throw new APIException("No category founded, please add new Categories");
         }
 
@@ -38,7 +48,12 @@ public class CategoryServiceImpl implements CategoryService{
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
                 .toList(); // mapped every object with categoryDTO
         CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setContent(categoryDTOS);  // create response that will take the dto responses
+        categoryResponse.setContent(categoryDTOS);// create response that will take the dto responses
+        categoryResponse.setPageNumber(categoryPage.getNumber());
+        categoryResponse.setPageSize(categoryPage.getSize());
+        categoryResponse.setTotalElements(categoryPage.getTotalElements());
+        categoryResponse.setTotalPages(categoryPage.getTotalPages());
+        categoryResponse.setLastPage(categoryPage.isLast());
         //return the category response
 
         return categoryResponse; // changed from returning list to returning categoryresoponse
