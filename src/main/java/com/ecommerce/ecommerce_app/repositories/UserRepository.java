@@ -1,8 +1,7 @@
 package com.ecommerce.ecommerce_app.repositories;
 
 import com.ecommerce.ecommerce_app.model.User;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
