@@ -12,4 +12,5 @@ public interface AddressService {
 
     List<AddressDTO> getEveryAddresses();
 
+    AddressDTO getAddressById(Long addressId);
 }
