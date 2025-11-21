@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class AddressServiceImpl implements AddressService{
     @Autowired
@@ -35,6 +37,14 @@ public class AddressServiceImpl implements AddressService{
         user.setAddresses(addressesList);
         Address savedAddress = addressRepo.save(address);
         return modelMapper.map(savedAddress, AddressDTO.class);
+    }
+
+    @Override
+    public List<AddressDTO> getEveryAddresses() {
+        List<Address> addressDTOS = addressRepo.findAll();
+        return addressDTOS.stream().map(address ->
+            modelMapper.map(address, AddressDTO.class)
+        ).toList();
     }
 }
 
