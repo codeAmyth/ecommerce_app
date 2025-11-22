@@ -54,5 +54,41 @@ public class AddressServiceImpl implements AddressService{
              new ResourceNotFoundException("Address", "addressID", addressId));
         return modelMapper.map(address, AddressDTO.class);
     }
+
+    @Override
+    public List<AddressDTO> getUserAddress(User user) {
+        List<Address> userAddress = user.getAddresses();
+        return userAddress.stream().map(address ->
+                modelMapper.map(address, AddressDTO.class)).toList();
+    }
+
+    @Override
+    public AddressDTO updateAddressById(Long addressId, AddressDTO addressDTO) {
+        Address address = addressRepo.findById(addressId).orElseThrow(() ->
+                new ResourceNotFoundException("Address", "addressId", addressId));
+        address.setCity(addressDTO.getCity());
+        address.setPincode(addressDTO.getPincode());
+        address.setState(addressDTO.getState());
+        address.setCountry(addressDTO.getCountry());
+        address.setStreet(addressDTO.getStreet());
+        address.setBuildingName(addressDTO.getBuildingName());
+
+        Address updatedAddress = addressRepo.save(address);
+
+        User user = address.getUser();
+        user.getAddresses().removeIf(address1 -> address1.getAddressId().equals(addressId));
+        user.getAddresses().add(updatedAddress);
+        userRepo.save(user);
+        return modelMapper.map(updatedAddress, AddressDTO.class);
+    }
+
+    @Override
+    public String deleteAddress(Long addressId) {
+        Address address = addressRepo.findById(addressId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Address", "addressId", addressId));
+        addressRepo.delete(address);
+        return "Address deleted successfully!";
+    }
 }
 
